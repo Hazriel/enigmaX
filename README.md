@@ -166,4 +166,4 @@ display further help
 
 ## How it works
 
-![representation](representation.PNG "Graphical Representation")
+![representation](img/representation.png "Graphical Representation")
