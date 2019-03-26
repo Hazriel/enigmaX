@@ -1,0 +1,8 @@
+*.o
+*.bin
+*.out
+*.log
+bin
+*.backup
+.tags
+build
