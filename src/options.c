@@ -125,6 +125,39 @@ static int handle_positionnal_arguments(struct options *opts,
   return 0;
 }
 
+/**
+ * Generic file checking for basic checks.
+ * The struct stat is initialized through this function and can be used directly
+ * in the check file name and key file functions.
+ */
+static int check_file_generic(const char *file, struct stat *st)
+{
+  int ret = stat(file, st);
+  if (ret != 0)
+  {
+    warn("error while checking file %s", file);
+    return -1;
+  }
+  if (S_ISDIR(st->st_mode) || S_ISREG(st->st_mode) || S_ISLNK(st->st_mode))
+    return 0;
+  else
+    return -1;
+}
+
+static int check_file_name(const char *file)
+{
+  struct stat st;
+  int ret = check_file_generic(file, &st);
+  return ret;
+}
+
+static int check_key_file(const char *key)
+{
+  struct stat st;
+  int ret = check_file_generic(key, &st);
+  return ret;
+}
+
 int get_user_options(struct options *opts, int argc, char *argv[])
 {
   if (handle_options(opts, argc, argv) < 0)
@@ -134,21 +167,18 @@ int get_user_options(struct options *opts, int argc, char *argv[])
 
 int check_user_options(struct options *opts)
 {
-  struct stat;
+  int ret = 0;
   if (opts->file_name != NULL)
-  {
-    // FIXME: check if the file exists
-  }
+    ret = check_file_name(opts->file_name);
   else
   {
     warnx("missing file name");
     return -1;
   }
-  if (opts->key_file != NULL)
-  {
-    // FIXME: check if the file exists
-  }
-  return 0;
+  if (ret == 0 && opts->key_file != NULL)
+    ret = check_key_file(opts->key_file);
+
+  return ret;
 }
 
 void dump_options(struct options *opts)
